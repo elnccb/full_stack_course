@@ -94,6 +94,14 @@ const App = () => {
             setMessage(null)
           }, 5000)
         })
+        .catch(() => {
+          setError(true)
+          setMessage(`Server is missing information`)
+          setTimeout(() => {
+            setMessage(null)
+            setError(false)
+          }, 5000)
+        })
     } else {
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
         noteService
