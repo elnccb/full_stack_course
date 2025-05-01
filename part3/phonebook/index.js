@@ -5,6 +5,7 @@ const app = express()
 
 app.use(cors())
 app.use(express.json())
+app.use(express.static('dist'))
 morgan.token('content', (request, response) => request.headers['content-type'] === 'application/json' ? JSON.stringify(request.body) : ' ')
 app.use(morgan(morgan.tiny + ' :content'))
 
