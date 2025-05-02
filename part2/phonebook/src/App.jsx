@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import noteService from './services/persons'
+import personService from './services/persons'
 
 const Notification = ({message, error}) => {
   if(message === null) {
@@ -83,7 +83,7 @@ const App = () => {
     const person = persons.find((person) => person.name === nameObject.name)
 
     if(person === undefined) {
-      noteService
+      personService
         .create(nameObject)
         .then((data) => {
           setPersons(persons.concat({...nameObject, id:data.id}))
@@ -94,9 +94,9 @@ const App = () => {
             setMessage(null)
           }, 5000)
         })
-        .catch(() => {
+        .catch((error) => {
           setError(true)
-          setMessage(data.error)
+          setMessage(error.response.data.error)
           setTimeout(() => {
             setMessage(null)
             setError(false)
@@ -104,7 +104,7 @@ const App = () => {
         })
     } else {
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
-        noteService
+        personService
         .update(person.id, nameObject)
         .then(() => {
           setPersons(persons.map(entry => entry.id === person.id ? {...nameObject, id:person.id} : entry))
@@ -115,14 +115,18 @@ const App = () => {
             setMessage(null)
           }, 5000)
         })
-        .catch(() => {
+        .catch((error) => {
           setError(true)
-          setMessage(`Information of ${person.name} has already been removed from server`)
+          if (error.response.data.error) {
+            setMessage(error.response.data.error)
+          } else {
+            setMessage(`Information of ${person.name} has already been removed from server`)
+            setPersons(persons.filter(n => n.id !== person.id))
+          }
           setTimeout(() => {
             setMessage(null)
             setError(false)
           }, 5000)
-          setPersons(persons.filter(n => n.id !== person.id))
         })
       }
     }
@@ -135,11 +139,19 @@ const App = () => {
 
   const deleteName = (person) => {
     if (window.confirm(`Delete ${person.name}?`)) {
-      noteService.
+      personService.
         eliminate(person.id)
-        .then(() => {
-          setPersons(persons.filter(entry => entry.id !== person.id))
-        })
+          .then(() => {
+            setPersons(persons.filter(entry => entry.id !== person.id))
+          })
+          .catch(error => {
+            setError(true)
+            setMessage(error.response.data.error)
+            setTimeout(() => {
+              setMessage(null)
+              setError(false)
+            }, 5000)
+          })
     }
   }
 
@@ -156,7 +168,7 @@ const App = () => {
   }
 
   useEffect(() => {
-    noteService
+    personService
       .getAll()
       .then(data => {
         setPersons(data)
