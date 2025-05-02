@@ -96,7 +96,7 @@ const App = () => {
         })
         .catch(() => {
           setError(true)
-          setMessage(`Server is missing information`)
+          setMessage(data.error)
           setTimeout(() => {
             setMessage(null)
             setError(false)

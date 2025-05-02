@@ -9,7 +9,7 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:3001',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api/, ''),
+        //rewrite: (path) => path.replace(/^\/api/, ''),
         configure: (proxy) => {
           proxy.on('proxyReq', (proxyReq, req) => {
             console.log(`[proxy] ${req.method} ${req.url} -> ${proxyReq.getHeader('host')}`)
